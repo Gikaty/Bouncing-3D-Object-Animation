@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bouncing 3D Object Animation</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Create the object (Sphere)
+        const geometry = new THREE.SphereGeometry(0.5, 32, 32);
+        const material = new THREE.MeshPhongMaterial({ color: 0xFF0000 }); // Initial red color
+        const myMesh = new THREE.Mesh(geometry, material);
+        scene.add(myMesh);
+
+        // Position camera
+        camera.position.z = 5;
+
+        // Create light source (light yellow)
+        const light = new THREE.PointLight(0xFFFFAA, 1, 100);
+        light.position.set(-3, 3, 5);
+        scene.add(light);
+
+        // Ambient light for some additional illumination
+        const ambientLight = new THREE.AmbientLight(0x404040);
+        scene.add(ambientLight);
+
+        // Movement variables
+        let velocityX = 0.05;
+        let velocityY = 0.05;
+
+        // Viewport limits (adjust based on camera setup)
+        const viewportWidth = 4;
+        const viewportHeight = 3;
+
+        // Color options for bouncing
+        const colors = [
+            0xFF0000,   // Red
+            0x00FF00,   // Green
+            0x0000FF,   // Blue
+            0xFFFF00,   // Yellow
+            0xFF00FF,   // Magenta
+            0x00FFFF    // Cyan
+        ];
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Move the object
+            myMesh.position.x += velocityX;
+            myMesh.position.y += velocityY;
+
+            // Check for bouncing and color change
+            if (Math.abs(myMesh.position.x) > viewportWidth / 2) {
+                velocityX = -velocityX;
+                // Change color when hitting horizontal boundaries
+                myMesh.material.color.setHex(colors[Math.floor(Math.random() * colors.length)]);
+            }
+
+            if (Math.abs(myMesh.position.y) > viewportHeight / 2) {
+                velocityY = -velocityY;
+                // Change color when hitting vertical boundaries
+                myMesh.material.color.setHex(colors[Math.floor(Math.random() * colors.length)]);
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resizing
+        window.addEventListener('resize', () => {
+            const newWidth = window.innerWidth;
+            const newHeight = window.innerHeight;
+
+            camera.aspect = newWidth / newHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(newWidth, newHeight);
+        });
+
+        // Start the animation
+        animate();
+    </script>
+</body>
+</html>
